@@ -16,6 +16,7 @@ router.get("", async (req, res) => {
       data,
       current: page,
       nextPage: hasNextPage ? nextPage : null,
+      currentRoute: "/",
     });
   } catch (error) {
     console.log(error);
@@ -26,7 +27,7 @@ router.get("/post/:id", async (req, res) => {
   try {
     let slug = req.params.id;
     const data = await Post.findById({ _id: slug });
-    res.render("post", { data });
+    res.render("post", { data, currentRoute: `/post${slug}` });
   } catch (error) {
     console.log(error);
   }
@@ -95,7 +96,7 @@ router.post("/search", async (req, res) => {
 // insertPostData()
 
 router.get("/about", (req, res) => {
-  res.render("about");
+  res.render("about", {currentRoute: '/about'});
 });
 
 module.exports = router;

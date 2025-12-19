@@ -52,8 +52,85 @@ router.post("/admin", async (req, res) => {
 });
 
 router.get("/dashboard", authMiddleWare, async (req, res) => {
-  res.render("admin/dashboard");
+  try {
+    const data = await Post.find();
+    res.render("admin/dashboard", { data, layout: adminLayout });
+  } catch (error) {
+    console.log(error);
+  }
 });
+
+router.get("/add-post", authMiddleWare, async (req, res) => {
+  try {
+    const data = await Post.find();
+    res.render("admin/add-post", { layout: adminLayout });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+router.post("/add-post", authMiddleWare, async (req, res) => {
+  try {
+    try {
+      const newPost = new Post({
+        title: req.body.title,
+        body: req.body.body,
+      });
+      await Post.create(newPost);
+      res.redirect("/dashboard");
+    } catch (error) {
+      console.log(error);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+router.get("/edit-post/:id", authMiddleWare, async (req, res) => {
+  try {
+    const data = await Post.findOne({ _id: req.params.id });
+    res.render("admin/edit-post", {
+      data,
+      layout: adminLayout,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+router.put("/edit-post/:id", authMiddleWare, async (req, res) => {
+  try {
+    await Post.findByIdAndUpdate(req.params.id, {
+      title: req.body.title,
+      body: req.body.body,
+      updatedAt: Date.now(),
+    });
+    res.redirect(`/edit-post/${req.params.id}`);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+router.delete("/delete-post/:id", authMiddleWare, async (req, res) => {
+  try {
+    await Post.deleteOne({ _id: req.params.id });
+    res.redirect("/dashboard");
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+
+router.get('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.redirect('/')
+})
+
+
+
+
+
+
 
 // router.post("/admin", async (req, res) => {
 //   try {
